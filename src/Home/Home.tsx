@@ -70,13 +70,6 @@ const getHomeNotices = async (url: string) => {
             console.error('Error fetching image links:', error);
             });
     return data;
-    return [
-    {title: "Test Title.", image_url: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fimg3.gelbooru.com%2Fimages%2F39%2F97%2F3997b20299f536b2dc1bac105c5d3274.png&f=1&nofb=1&ipt=bfacd468530eb784e59f0dfbcf65767a35172197f4f6ce0f5ecefc420364b67b&ipo=images"},
-    {title: "Test Title.", image_url: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fimg3.gelbooru.com%2Fimages%2F39%2F97%2F3997b20299f536b2dc1bac105c5d3274.png&f=1&nofb=1&ipt=bfacd468530eb784e59f0dfbcf65767a35172197f4f6ce0f5ecefc420364b67b&ipo=images"},
-    {title: "Test Title.", image_url: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fimg3.gelbooru.com%2Fimages%2F39%2F97%2F3997b20299f536b2dc1bac105c5d3274.png&f=1&nofb=1&ipt=bfacd468530eb784e59f0dfbcf65767a35172197f4f6ce0f5ecefc420364b67b&ipo=images"},
-    {title: "Test Title.", image_url: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fimg3.gelbooru.com%2Fimages%2F39%2F97%2F3997b20299f536b2dc1bac105c5d3274.png&f=1&nofb=1&ipt=bfacd468530eb784e59f0dfbcf65767a35172197f4f6ce0f5ecefc420364b67b&ipo=images"},
-    {title: "Test Title.", image_url: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fimg3.gelbooru.com%2Fimages%2F39%2F97%2F3997b20299f536b2dc1bac105c5d3274.png&f=1&nofb=1&ipt=bfacd468530eb784e59f0dfbcf65767a35172197f4f6ce0f5ecefc420364b67b&ipo=images"},
-    ];
 }
 
 interface HomePostProps {
