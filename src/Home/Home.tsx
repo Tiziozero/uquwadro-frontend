@@ -5,7 +5,6 @@ const Home = () => {
     const [opacity, setOpacity] = useState(0);
     const [navbarPosY, setNavbarPosY] = useState(0);
 
-    const [homePosts, setHomePosts] = useState<any[]>([]);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -24,16 +23,6 @@ const Home = () => {
             window.removeEventListener('scroll', handleScroll);
         };
     }, []);
-    useEffect(() => {
-        console.log("Use Effect");
-        const f = async () => {
-            const hp = await getHomeNotices("https://www.reddit.com/search/?q=genshin&type=media&cId=6cdd1511-9c68-4120-9a9a-aa363c0406e0&iId=f453d8d3-684d-453b-bc56-77bd3074a0c2");
-            console.info("setting hp to: ")
-            console.info(hp);
-            setHomePosts(hp);
-        }
-        f()
-    }, []);
     return (
     <>
         <div className="flex flex-col justify-center items-center">
@@ -43,22 +32,58 @@ const Home = () => {
             <div className="min-h-screen flex-1" style={{ opacity: opacity}}>
                 <Navbar styles={{position: "fixed",top: navbarPosY, left: 0}} />
                 <div className="pt-16 max-w-[60rem] w-[60rem] h-screen">
-                    <div className="py-1 max-w-[60rem] w-[60rem] flex flex-col items-center justify-center">
-                    {homePosts.map((p, index) => {
-                        const t = p.title;
-                        const img = p.image_url;
-                        const l = index % 2 == 0 ? 'e': 'o';
-                        console.log(t, img, l)
-                        return <HomePost title={t} image_url={img} layout={l} key={index} />
-                    })}
-                    </div>
+                    <HomeMainPage />
                 </div>
             </div>
         </div>
     </>);
 }
 
+const HomeMainPage: React.FC = React.memo(() => {
+    console.log("HomeMainPage");
+    const [homePosts, setHomePosts] = useState<any[]>([]);
+    const [hpError, setHpError] = useState<boolean>(false);
+
+    useEffect(() => {
+
+        console.log("Use Effect");
+        const fetchData = async () => {
+            try {
+                const data = await getHomeNotices("");
+                console.log(data)
+                if (data.length === 0) {
+                    setHpError(true);
+                } else {
+                    setHpError(false);
+                    setHomePosts(data);
+                }
+            } catch (e) {
+                setHpError(true);
+                setHomePosts([]);
+            }
+            console.log("End of HomeMainPage use effect");
+        };
+        fetchData();
+    }, []);
+
+    console.log("Returning from main home posts");
+    return (
+        <div className="py-1 max-w-[60rem] w-[60rem] flex flex-col items-center justify-center">
+            {homePosts.map((p, index) => {
+
+                const t = p.title;
+                const img = p.image_url;
+                const l = index % 2 === 0 ? 'e' : 'o';
+                console.log(index, img);
+                return <HomePost title={t} image_url={img} layout={l} key={index} />;
+            })}
+            <GetExtraPosts />
+        </div>
+    );
+});
+
 const getHomeNotices = async (url: string) => {
+    console.log("Getting home notices at " + url);
     const data = await fetch(`http://localhost:8081/?url=${encodeURIComponent(url)}`)
         .then(response => response.json())
 
@@ -68,6 +93,7 @@ const getHomeNotices = async (url: string) => {
                 })
     .catch(error => {
             console.error('Error fetching image links:', error);
+            return [];
             });
     return data;
 }
@@ -101,6 +127,10 @@ const HomePost: React.FC<HomePostProps> = ({title, image_url, layout}) => {
     </div>
     </>
     return layout === 'e' ? e: o;
+}
+
+const GetExtraPosts: React.FC = () => {
+    return (<></>);
 }
 
 interface NavbarProps {
