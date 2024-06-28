@@ -1,9 +1,16 @@
-import { useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { setUser } from './User/userSlice';
+import { RootState } from "../store/store";
+
+
+
 const Home = () => {
     const [opacity, setOpacity] = useState(0);
     const [navbarPosY, setNavbarPosY] = useState(0);
+
 
 
     useEffect(() => {
@@ -29,28 +36,26 @@ const Home = () => {
             <div className="w-screen h-screen flex justify-center items-center" style={{ opacity: 1 - opacity}}>
                 <h1 className="text-white text-7xl">uQuwadro<small className="text-2xl">.com</small></h1>
             </div>
-            <div className="min-h-screen flex-1" style={{ opacity: opacity}}>
+            <div className="flex-1" style={{ opacity: opacity}}>
                 <Navbar styles={{position: "fixed",top: navbarPosY, left: 0}} />
-                <div className="pt-16 max-w-[60rem] w-[60rem] h-screen">
+                <div className="pt-16 max-w-[60rem] w-[60rem]">
                     <HomeMainPage />
                 </div>
             </div>
+            <HomeFooter />
         </div>
     </>);
 }
 
 const HomeMainPage: React.FC = React.memo(() => {
-    console.log("HomeMainPage");
     const [homePosts, setHomePosts] = useState<any[]>([]);
     const [hpError, setHpError] = useState<boolean>(false);
 
     useEffect(() => {
 
-        console.log("Use Effect");
         const fetchData = async () => {
             try {
                 const data = await getHomeNotices("");
-                console.log(data)
                 if (data.length === 0) {
                     setHpError(true);
                 } else {
@@ -61,20 +66,16 @@ const HomeMainPage: React.FC = React.memo(() => {
                 setHpError(true);
                 setHomePosts([]);
             }
-            console.log("End of HomeMainPage use effect");
         };
         fetchData();
     }, []);
 
-    console.log("Returning from main home posts");
     return (
         <div className="py-1 max-w-[60rem] w-[60rem] flex flex-col items-center justify-center">
             {homePosts.map((p, index) => {
-
                 const t = p.title;
                 const img = p.image_url;
                 const l = index % 2 === 0 ? 'e' : 'o';
-                console.log(index, img);
                 return <HomePost title={t} image_url={img} layout={l} key={index} />;
             })}
             <GetExtraPosts />
@@ -83,6 +84,16 @@ const HomeMainPage: React.FC = React.memo(() => {
 });
 
 const getHomeNotices = async (url: string) => {
+    return [
+    {title: "TestTitle1", image_url: "https://images.pexels.com/photos/45201/kitty-cat-kitten-pet-45201.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"},
+    {title: "TestTitle1", image_url: "https://images.pexels.com/photos/45201/kitty-cat-kitten-pet-45201.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"},
+    {title: "TestTitle1", image_url: "https://images.pexels.com/photos/45201/kitty-cat-kitten-pet-45201.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"},
+    {title: "TestTitle1", image_url: "https://images.pexels.com/photos/45201/kitty-cat-kitten-pet-45201.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"},
+    {title: "TestTitle1", image_url: "https://images.pexels.com/photos/45201/kitty-cat-kitten-pet-45201.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"},
+    {title: "TestTitle1", image_url: "https://images.pexels.com/photos/45201/kitty-cat-kitten-pet-45201.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"},
+    {title: "TestTitle1", image_url: "https://images.pexels.com/photos/45201/kitty-cat-kitten-pet-45201.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"},
+    ];
+    /*
     console.log("Getting home notices at " + url);
     const data = await fetch(`http://localhost:8081/?url=${encodeURIComponent(url)}`)
         .then(response => response.json())
@@ -96,6 +107,7 @@ const getHomeNotices = async (url: string) => {
             return [];
             });
     return data;
+    */
 }
 
 interface HomePostProps {
@@ -104,29 +116,38 @@ interface HomePostProps {
     layout: string;
 }
 const HomePost: React.FC<HomePostProps> = ({title, image_url, layout}) => {
-    const _img = <>
+    let content: ReactNode;
+    const _img = () => {
+        return <>
         <div className="h-80 w-80">
             <img className="h-80 w-80 object-contain" src={image_url} />
         </div>
         </>;
-    const _title = <>
+    }
+    const _title = () => {
+        return <>
         <div className="flex flex-col items-center justify-center flex-1">
             <p className="text-white"><b>{title}</b></p>
         </div>
-    </>;
+        </>;
+    }
+    if (layout === 'e') {
+        content = <>
+        <_img />
+        <_title />
+        </>;
+    } else {
+        content = <>
+        <_title />
+        <_img />
+        </>;
+    };
     const e = <>
-    <div className="max-w-[60rem] w-[60rem] flex flex-row justify-center items-center border border-white">
-        {_img}
-        {_title}
+    <div className="max-w-[60rem] w-[60rem] flex flex-row justify-center items-center border border-solid border-black hover:border-gray-500 transition-all duration-300">
+        {content}
     </div>
     </>
-    const o = <>
-    <div className="max-w-[60rem] w-[60rem] flex flex-row justify-center items-center border border-white">
-        {_title}
-        {_img}
-    </div>
-    </>
-    return layout === 'e' ? e: o;
+    return e;
 }
 
 const GetExtraPosts: React.FC = () => {
@@ -138,6 +159,8 @@ interface NavbarProps {
 }
 
 const Navbar: React.FC<NavbarProps> = ({styles}) => {
+    const user = useSelector((state: RootState) => state.user)
+    console.log("Is User Logged In", user.isLoggedIn)
 
     return (
         <nav className='w-full h-16 bg-gradient-to-tr from-uquwadro-main-blue to-black shadow-white-blur px-1' style={styles}>
@@ -149,9 +172,16 @@ const Navbar: React.FC<NavbarProps> = ({styles}) => {
                     <h1 className="text-white">uQuwadro<small>.com</small></h1>
                 </div>
                 <div id='nav-bar-options' className='flex flex-row gap-x-1 items-center justify-center'>
-                    <NavbarButton to="/about" name="About" />
-                    <NavbarButton to="/home" name="Home" />
-                    <NavbarButton to="/profile" name="Profile" />
+                    {user.isLoggedIn ? 
+                        <>
+                            <BaseuquwadroButton to="/about" name="About" />
+                            <BaseuquwadroButton to="/home" name="Home" />
+                            <BaseuquwadroButton to="/profile" name="Profile" />
+                        </> : <>
+                            <BaseuquwadroButton to="/login" name="Log In" />
+                            <BaseuquwadroButton to="/signup" name="Sign Up" />
+                        </>
+                    }
                 </div>
             </div>
         </nav>
@@ -163,12 +193,25 @@ interface NavbarButtonProps {
     name: string;
 }
 
-const NavbarButton: React.FC<NavbarButtonProps> = ({to, name}) => {
+const BaseuquwadroButton: React.FC<NavbarButtonProps> = ({to, name}) => {
     return (
-        <Link to={to} className='w-24 border border-white px-1.5 py-0.5 text-white rounded-full text-center hover:bg-white hover:text-black transition-all duration-300'>
+        <Link to={to} className='w-24 m-[2px] border border-white px-1.5 py-0.5 text-white rounded-full text-center hover:bg-white hover:text-black transition-all duration-300'>
             <span><b>{name}</b></span>
         </Link>
    );
+}
+const HomeFooter = () => {
+    return <>
+    <div className="w-full h-40 flex flex-row justify-center items-center">
+        <div className="w-[50vh] h-full flex flex-col justify-center items-center mr-auto">
+            <BaseuquwadroButton to="/login" name="Log In"/>
+            <BaseuquwadroButton to="/signup" name="Sign Up"/>
+        </div>
+        <div className="w-full h-full flex flex-column justify-center items-center">
+        <p className="text-white">aha ha</p>
+        </div>
+    </div>
+    </>;
 }
 
 export default Home;

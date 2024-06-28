@@ -1,11 +1,12 @@
-// src/store.ts
 import { configureStore } from '@reduxjs/toolkit';
 import { useDispatch } from 'react-redux';
 import messagesReducer from './messagesSlice';
+import userReducer from '../User/userSlice'; // Adjusted path
 
 export const store = configureStore({
   reducer: {
     messages: messagesReducer,
+    user: userReducer,
   },
 });
 

@@ -1,13 +1,16 @@
-// src/messagesSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Message } from '../utils/types';
 
+interface ChannelMessages {
+    messages: Message[];
+}
+
 interface MessagesState {
-  messages: Message[];
+    messages: { [key: string]: ChannelMessages };
 }
 
 const initialState: MessagesState = {
-  messages: [],
+  messages: {},
 };
 
 const messagesSlice = createSlice({
@@ -15,17 +18,25 @@ const messagesSlice = createSlice({
   initialState,
   reducers: {
     addMessage: (state, action: PayloadAction<Message>) => {
-      state.messages.push(action.payload);
+      const channelId = action.payload.channel_id;
+      if (!state.messages[channelId]) {
+        state.messages[channelId] = { messages: [] };
+      }
+      state.messages[channelId].messages.push(action.payload);
     },
-    removeMessage: (state, action: PayloadAction<number>) => {
-      state.messages = state.messages.filter(message => message.id !== action.payload);
+    removeMessage: (state, action: PayloadAction<{ channelId: string, messageId: number }>) => {
+      const { channelId, messageId } = action.payload;
+      if (state.messages[channelId]) {
+        state.messages[channelId].messages = state.messages[channelId].messages.filter(message => message.id !== messageId);
+      }
     },
     clearMessages: (state) => {
-        state.messages = [];
+      state.messages = {};
     },
   },
 });
 
-export const { addMessage, removeMessage } = messagesSlice.actions;
+export const { addMessage, removeMessage, clearMessages } = messagesSlice.actions;
 
 export default messagesSlice.reducer;
+
